@@ -1,4 +1,8 @@
-# VMX refund
+# VMX refund snapshot
+
+Snapshot will take place using a merkle airdrop contract on Base.
+
+## File structure
 
 This repo contains
 

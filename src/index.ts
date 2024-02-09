@@ -48,7 +48,7 @@ async function main() {
     const address = getAddress(baseHolder.HolderAddress)
     const refundAmount = refundsPerAddress.get(address)
 
-    if (refundAmount !== undefined) {
+    if (refundAmount !== undefined && refundAmount > 1) {
       holdingsPerAddress.set(address, baseHolder.Balance)
     }
   }
@@ -84,7 +84,11 @@ async function main() {
       }
 
       const existingHoldings = holdingsPerAddress.get(address) ?? 0
-      holdingsPerAddress.set(address, balance + existingHoldings)
+
+      if (balance > 1) {
+        holdingsPerAddress.set(address, existingHoldings + balance)
+      }
+
     }
   }
 
@@ -99,7 +103,7 @@ async function main() {
     } else {
       return { address, balance: 0 }
     }
-  }).sort((a, b) => {
+  }).filter(account => account.balance > 0).sort((a, b) => {
     return b.balance - a.balance
   })
 
