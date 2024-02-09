@@ -1,3 +1,13 @@
+# VMX refund
+
+This repo contains
+
+- [snapshot.json](/snapshot.json): Amounts to refund by account
+
+- [CSV snapshots](/snapshots/)
+  - Fjord snapshot is taken from Dune analytics
+  - VMX balances were snapshotted on 8th Feb, 4:35 pm UTC.
+
 # Invalid addresses
 
 Spurious addresses returned from Dune. They have neglibible buys so can be ignored.
