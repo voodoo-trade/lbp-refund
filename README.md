@@ -12,6 +12,17 @@ This repo contains
   - Fjord snapshot is taken from Dune analytics
   - VMX balances were snapshotted on 8th Feb, 4:35 pm UTC.
 
+## Refund plan
+
+Out of 40M VMX sold
+
+- 14M were with holders
+  - Swap for a fixed rate
+
+- 26M were sold or in the LBP
+  - Those who sold get ETH, without having to redeem
+  - For tokens that are still in the LBP, it is impossible to wait for all tokens to get redeemed. These holders get ETH at a fixed rate, without having to redeem. The VMX still in the LBP can be sold in the market, making their deal similar to panic sellers.
+
 # Invalid addresses
 
 Spurious addresses returned from Dune. They have neglibible buys so can be ignored.

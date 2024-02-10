@@ -3,6 +3,7 @@ import fjordBuyers from './snapshots/fjord-snapshot.json'
 import baseHolders from './snapshots/vmx-holders-base-10353526.json'
 import ethHolders from './snapshots/vmx-holders-ethereum-19191794.json'
 import fs from 'node:fs'
+import invariant from 'tiny-invariant'
 
 const TEAM_WALLETS = [
   // Team
@@ -28,9 +29,11 @@ const TEAM_WALLETS = [
 ].map(addr => getAddress(addr))
 
 async function main() {
-  const refundsPerAddress = new Map<string, number>()
+  const lbpBuyers = new Map<string, number>()
   const holdingsPerAddress = new Map<string, number>()
 
+  let totalVmxSold = 0
+  let totalParticipants = 0
   for (const fjordBuyer of fjordBuyers) {
     try {
       const address = extractAddress(fjordBuyer.user_link)
@@ -39,14 +42,17 @@ async function main() {
         continue
       }
       const vmxBoughtInFjord = fjordBuyer.shares_amount
-      refundsPerAddress.set(address, vmxBoughtInFjord)
+      lbpBuyers.set(address, vmxBoughtInFjord)
+
+      totalVmxSold += vmxBoughtInFjord
+      totalParticipants += 1
     } catch (error) {
     }
   }
 
   for (const baseHolder of baseHolders) {
     const address = getAddress(baseHolder.HolderAddress)
-    const refundAmount = refundsPerAddress.get(address)
+    const refundAmount = lbpBuyers.get(address)
 
     if (refundAmount !== undefined && refundAmount > 1) {
       holdingsPerAddress.set(address, baseHolder.Balance)
@@ -55,7 +61,7 @@ async function main() {
 
   for (const holder of ethHolders) {
     const address = getAddress(holder.HolderAddress)
-    const refundAmount = refundsPerAddress.get(address)
+    const refundAmount = lbpBuyers.get(address)
 
     if (refundAmount !== undefined) {
       let balance = 0
@@ -92,7 +98,8 @@ async function main() {
     }
   }
 
-  const refundsArray = Array.from(refundsPerAddress).map(([address, balance]) => {
+  // LBP participants who are holding full or part of the LBP tokens
+  const holderBalances = Array.from(lbpBuyers).map(([address, balance]) => {
     const holdings = holdingsPerAddress.get(address)
 
     if (holdings !== undefined) {
@@ -103,21 +110,55 @@ async function main() {
     } else {
       return { address, balance: 0 }
     }
-  }).filter(account => account.balance > 0).sort((a, b) => {
+  }).filter(account => account.balance > 1).sort((a, b) => {
     return b.balance - a.balance
   })
 
-  const balancesJSON = JSON.stringify(refundsArray, null, 2);
+  // Sellers- LBP buyers sold completely, or those who did not redeem at snapshot time
+  const sellerBalances = Array.from(lbpBuyers).filter(([address, lbpBought]) => {
+    const currentBalance = holdingsPerAddress.get(address) ?? 0
 
-  fs.writeFileSync('snapshot.json', balancesJSON)
+    return currentBalance < 1
+  }).map(([address, lbpBought]) => {
+    return {
+      address,
+      balance: lbpBought
+    }
+  })
 
-  let dueVmx = 0
-  for (const userRefund of refundsArray) {
-    dueVmx += userRefund.balance
+  const common = findCommonElements(holderBalances, sellerBalances)
+  invariant(common.length === 0)
+
+  const holderBalancesJSON = JSON.stringify(holderBalances, null, 2);
+  fs.writeFileSync('holders-snapshot.json', holderBalancesJSON)
+
+  const sellerBalancesJSON = JSON.stringify(sellerBalances, null, 2);
+  fs.writeFileSync('sellers-snapshot.json', sellerBalancesJSON)
+
+  let holderVmx = 0
+  for (const balances of holderBalances) {
+    holderVmx += balances.balance
   }
 
-  console.log('due', dueVmx)
-  console.log('user count', refundsArray.length)
+  let sellerVmx = 0
+  for (const refund of sellerBalances) {
+    sellerVmx += refund.balance
+  }
+
+  const holderRate = 0.09
+  const sellerRate = 0.06
+
+  const holderRefund = holderVmx * holderRate
+  const sellerRefund = sellerVmx * sellerRate
+
+  const missingParticipants = totalParticipants - holderBalances.length - sellerBalances.length
+  invariant(missingParticipants === 0)
+
+  console.log('LBP participants:', totalParticipants, ',VMX sold:', totalVmxSold.toLocaleString())
+  console.log('holders:', holderBalances.length, ',VMX:', holderVmx.toLocaleString(), ',rate: $', holderRate, ',refund: $', holderRefund.toLocaleString())
+  console.log('sellers:', sellerBalances.length, ',VMX:', sellerVmx.toLocaleString(), ',rate: $', sellerRate, ',refund: $', sellerRefund.toLocaleString())
+
+  console.log('Money to refund: $', (holderRefund + sellerRefund).toLocaleString())
 }
 
 void main()
@@ -133,4 +174,20 @@ function extractAddress(input: string): string {
   } else {
     throw Error('Failed to extract for ' + input)
   }
+}
+
+interface Holder {
+  address: string;
+  balance: number;
+}
+
+
+function findCommonElements(arr1: Holder[], arr2: Holder[]): Holder[] {
+  // Filter elements of arr1 that are present in arr2
+  return arr1.filter(holderA => arr2.some(holderB => holderA.address === holderB.address && holderA.balance === holderB.balance));
+}
+
+function findElementsNotInA(arrA: Holder[], arrB: Holder[]): Holder[] {
+  // Filter elements of arrB that are not present in arrA
+  return arrB.filter(holderB => !arrA.some(holderA => holderA.address === holderB.address && holderA.balance === holderB.balance));
 }
