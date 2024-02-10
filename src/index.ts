@@ -1,4 +1,5 @@
 import { getAddress } from 'ethers'
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree"
 import fjordBuyers from './snapshots/fjord-snapshot.json'
 import baseHolders from './snapshots/vmx-holders-base-10353526.json'
 import ethHolders from './snapshots/vmx-holders-ethereum-19191794.json'
@@ -145,20 +146,33 @@ async function main() {
     sellerVmx += refund.balance
   }
 
-  const holderRate = 0.09
-  const sellerRate = 0.06
+  const holderRateUsd = 0.12
+  const sellerRateUsd = 0.09
 
-  const holderRefund = holderVmx * holderRate
-  const sellerRefund = sellerVmx * sellerRate
+  const ethPrice = 2500
+
+  const holderRateEth = holderRateUsd / ethPrice
+  const sellerRateEth = sellerRateUsd / ethPrice
+
+  const holderRefund = holderVmx * holderRateUsd
+  const sellerRefund = sellerVmx * sellerRateUsd
 
   const missingParticipants = totalParticipants - holderBalances.length - sellerBalances.length
   invariant(missingParticipants === 0)
 
   console.log('LBP participants:', totalParticipants, ',VMX sold:', totalVmxSold.toLocaleString())
-  console.log('holders:', holderBalances.length, ',VMX:', holderVmx.toLocaleString(), ',rate: $', holderRate, ',refund: $', holderRefund.toLocaleString())
-  console.log('sellers:', sellerBalances.length, ',VMX:', sellerVmx.toLocaleString(), ',rate: $', sellerRate, ',refund: $', sellerRefund.toLocaleString())
+  console.log('holders:', holderBalances.length, ',VMX:', holderVmx.toLocaleString(), ',rate: $', holderRateUsd, ',refund: $', holderRefund.toLocaleString())
+  console.log('sellers:', sellerBalances.length, ',VMX:', sellerVmx.toLocaleString(), ',rate: $', sellerRateUsd, ',refund: $', sellerRefund.toLocaleString())
 
   console.log('Money to refund: $', (holderRefund + sellerRefund).toLocaleString())
+
+  // Generate merkle trees
+  // const holderTreeValues = holderBalances.map(({ address, balance }) => {
+  //   const refund = BigInt(Math.floor(balance * holderRateEth * 10**8)) * 10n**10n
+
+  //   return [address, refund.toString()]
+  // })
+  // const holderTree = StandardMerkleTree.of(holderTreeValues)
 }
 
 void main()
@@ -187,7 +201,8 @@ function findCommonElements(arr1: Holder[], arr2: Holder[]): Holder[] {
   return arr1.filter(holderA => arr2.some(holderB => holderA.address === holderB.address && holderA.balance === holderB.balance));
 }
 
-function findElementsNotInA(arrA: Holder[], arrB: Holder[]): Holder[] {
-  // Filter elements of arrB that are not present in arrA
-  return arrB.filter(holderB => !arrA.some(holderA => holderA.address === holderB.address && holderA.balance === holderB.balance));
-}
+// function getAmountInEth(vmx: number, rateUsd: number): bigint {
+//   const vmxE18 = BigInt(Math.floor(vmx)) * 10n**18n
+
+//   const ethPrice = 2500
+// }
