@@ -32,6 +32,7 @@ async function main() {
       totalParticipants += 1
       totalCompensationWei += compensationWei
     } catch (error) {
+      console.log('broken address', fjordBuyer.user_link, 'invested', fjordBuyer.net_token_amount, 'vmx', fjordBuyer.shares_amount)
     }
   }
 
@@ -64,8 +65,15 @@ function extractAddress(input: string): string {
   const match = input.match(regex);
   if (match && match[1]) {
       const addr = match[1]
+      try {
+        return getAddress(addr)
+      } catch (error) {
+        const index = addr.indexOf("0x")
+        const fixedAddress = addr.slice(0, index + 2) + "00" + addr.slice(index + 2)
 
-      return getAddress(addr)
+        return getAddress(fixedAddress)
+      }
+
       // return addr
   } else {
     throw Error('Failed to extract for ' + input)

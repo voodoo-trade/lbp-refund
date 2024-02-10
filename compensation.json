@@ -1525,6 +1525,11 @@
         "compensationWei": "984240000000000000"
     },
     {
+        "address": "0x004190BA9DEb85F8Cf70d18310636B3C5ba2DDbD",
+        "vmxBought": 24501,
+        "compensationWei": "980040000000000000"
+    },
+    {
         "address": "0x0eedeF2aC828dB3E53C11Ba87d4a902942E3aDa8",
         "vmxBought": 24179,
         "compensationWei": "967160000000000000"
@@ -2105,6 +2110,11 @@
         "compensationWei": "666880000000000000"
     },
     {
+        "address": "0x001B574534EBD178aE17647587e8F6FEa243135B",
+        "vmxBought": 16655,
+        "compensationWei": "666200000000000000"
+    },
+    {
         "address": "0x1b7FA3959b5A90b3956e93B5Dc881c762c25Bed0",
         "vmxBought": 16630,
         "compensationWei": "665200000000000000"
@@ -2433,6 +2443,11 @@
         "address": "0x8846bc561D8855A049Af86Ea05a695cAe661fe65",
         "vmxBought": 12224,
         "compensationWei": "488960000000000000"
+    },
+    {
+        "address": "0x00D21D415a9664B87f8D8d4c46Ad866A6d8475cD",
+        "vmxBought": 12188,
+        "compensationWei": "487520000000000000"
     },
     {
         "address": "0x145a96b9669685c263F196caaba3dDD5339CbdF0",
@@ -2980,6 +2995,11 @@
         "compensationWei": "331360000000000000"
     },
     {
+        "address": "0x00E8281FBEF8E201F8313EBb853Bad3325d383aC",
+        "vmxBought": 8274,
+        "compensationWei": "330960000000000000"
+    },
+    {
         "address": "0xd9e4616edb3bA1532E9263f7ecc885458E1B5E3d",
         "vmxBought": 8218,
         "compensationWei": "328720000000000000"
@@ -3123,6 +3143,11 @@
         "address": "0xE5A728ab2bC03A534f998d16d9c6c64EE8d79467",
         "vmxBought": 7570,
         "compensationWei": "302800000000000000"
+    },
+    {
+        "address": "0x00324D6FdBAA17b1a5256F396319d513AefbBAcf",
+        "vmxBought": 7540,
+        "compensationWei": "301600000000000000"
     },
     {
         "address": "0x933266534189fC69B212B181462D8f353909807e",
@@ -4380,6 +4405,11 @@
         "compensationWei": "106600000000000000"
     },
     {
+        "address": "0x00BA5748c6094017E30698Ae7aDEbb8D8ea99879",
+        "vmxBought": 2662,
+        "compensationWei": "106480000000000000"
+    },
+    {
         "address": "0xdd7f588e8872DAFdD98E17857A254fF4684E3e31",
         "vmxBought": 2647,
         "compensationWei": "105880000000000000"
@@ -4458,6 +4488,11 @@
         "address": "0xc6dCf8846D6da3791718cc924f63f0380dB8A1bA",
         "vmxBought": 2479,
         "compensationWei": "99160000000000000"
+    },
+    {
+        "address": "0x0014c49E3bb2b70807A3417509670d1d821B9997",
+        "vmxBought": 2467,
+        "compensationWei": "98680000000000000"
     },
     {
         "address": "0x67F0bAec89e806e0fc85413AE22E15F6c9b7779b",
@@ -4623,6 +4658,11 @@
         "address": "0x1bca4CF13adD87F1A825Da1DDC22A1DdD9795353",
         "vmxBought": 2128,
         "compensationWei": "85120000000000000"
+    },
+    {
+        "address": "0x009A285a604f23D7548CE16c3B214234c523D2AF",
+        "vmxBought": 2124,
+        "compensationWei": "84960000000000000"
     },
     {
         "address": "0xf43df57B6C2B52cC16EC9284b635Ce11c4070ACb",
@@ -5593,6 +5633,11 @@
         "address": "0x03a80D254E8C561d13C602D9c18608825c4A90B9",
         "vmxBought": 690,
         "compensationWei": "27600000000000000"
+    },
+    {
+        "address": "0x0094b031455A1e68532De5C455FD1e088FE793f9",
+        "vmxBought": 689,
+        "compensationWei": "27560000000000000"
     },
     {
         "address": "0x03200a6b677C9A2Bd7D7A96fEBdcb69E88c07D0B",
