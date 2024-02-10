@@ -13,8 +13,8 @@ async function main() {
   let totalParticipants = 0
   let totalCompensationWei = 0n
 
-  // $0.105 per VMX when ETH is $2500
-  const refundRateWei = 42000000000000n
+  // $0.10 per VMX when ETH is $2500
+  const refundRateWei = 40000000000000n
 
   for (const fjordBuyer of fjordBuyers) {
     try {
