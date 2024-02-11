@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { LiquidityBootstrapPool__factory } from "./LiquidityBootstrapPool__factory";
-export { MultiSend__factory } from "./MultiSend__factory";
+export { Vyper_contract__factory } from "./Vyper_contract__factory";

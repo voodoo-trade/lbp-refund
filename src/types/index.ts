@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { LiquidityBootstrapPool } from "./LiquidityBootstrapPool";
-export type { MultiSend } from "./MultiSend";
+export type { Vyper_contract } from "./Vyper_contract";
 export * as factories from "./factories";
 export { LiquidityBootstrapPool__factory } from "./factories/LiquidityBootstrapPool__factory";
-export { MultiSend__factory } from "./factories/MultiSend__factory";
+export { Vyper_contract__factory } from "./factories/Vyper_contract__factory";

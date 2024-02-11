@@ -1,82 +1,94 @@
-import { formatEther, getAddress } from 'ethers'
-import { StandardMerkleTree } from "@openzeppelin/merkle-tree"
-import fjordBuyers from './snapshots/fjord-snapshot.json'
+import sleep from 'thread-sleep'
 import fs from 'node:fs'
 
+import wallets from '../compensation.json'
+import { multisend } from './contracts'
+import { formatEther } from 'ethers'
+
+const compensationPerHash = new Map<string, {
+  address: string;
+  vmxBought: number;
+  compensationWei: string;
+}[]>()
+
 async function main() {
-  const lbpParticipants = new Map<string, {
-    vmxBought: number,
-    compensationWei: BigInt
-  }>()
+  // IMPORTANT- end is inclusive. If it fails midway, start with 'completed index' + 1
+  const START_INDEX = 14
 
-  let totalVmxSold = 0
-  let totalParticipants = 0
-  let totalCompensationWei = 0n
+  const walletChunks = chunkArray(wallets, 20)
 
-  // $0.11 per VMX when ETH is $2500
-  // 0.11 * 10**18 / 2500
-  const refundRateWei = 44000000000000n
+  let i = 0
 
-  for (const fjordBuyer of fjordBuyers) {
-    try {
-      const address = extractAddress(fjordBuyer.user_link)
+  try {
+    for (i = START_INDEX; i < walletChunks.length; i++) {
+      const chunk = walletChunks[i]
 
-      const vmxBought = Math.floor(fjordBuyer.shares_amount)
+      const chunkLength = chunk.length
 
-      const compensationWei = BigInt(vmxBought) * refundRateWei
-      lbpParticipants.set(address, {
-        vmxBought,
-        compensationWei
+      const paddingLength = 100 - chunkLength
+      const addresses = [
+        ...chunk.map(user => user.address),
+        ...createArrayOfValues('0x0000000000000000000000000000000000000000', paddingLength)
+      ]
+      const amounts = [
+        ...chunk.map(user => BigInt(user.compensationWei)),
+        ...createArrayOfBigInt(0n, paddingLength)
+      ]
+
+      const value = amounts.reduce((acc, current) => acc + current, 0n)
+
+      const resp = await multisend.multiSendEther(addresses, amounts, {
+        value,
       })
+      compensationPerHash.set(resp.hash, chunk)
+      console.log('chunk', i, 'hash', resp.hash, 'ETH', formatEther(value))
 
-      totalVmxSold += vmxBought
-      totalParticipants += 1
-      totalCompensationWei += compensationWei
-    } catch (error) {
-      console.log('broken address', fjordBuyer.user_link, 'invested', fjordBuyer.net_token_amount, 'vmx', fjordBuyer.shares_amount)
+      sleep(50_000)
+
     }
+  } catch (error) {
+    console.error('error', error)
+
+    // The chunk that failed does not count
+    i-= 1
   }
 
-  const totalCompensationEth = formatEther(totalCompensationWei)
-  console.log('total compensation in ETH', totalCompensationEth)
-
-  const compensationArray = Array.from(lbpParticipants).map((lbpParticipant) => {
+  const compensationArray = Array.from(compensationPerHash).map(compensation => {
     return {
-      address: lbpParticipant[0],
-      vmxBought: lbpParticipant[1].vmxBought,
-      compensationWei: lbpParticipant[1].compensationWei.toString(),
+      [compensation[0]]: compensation[1]
     }
-  }).sort((a, b) => a.vmxBought - b.vmxBought)
-
-  fs.writeFileSync('compensation.json', JSON.stringify(compensationArray, null, 4))
-
-  // Generate merkle trees
-  const merkleTreeValues = Array.from(lbpParticipants).map((lbpParticipant) => {
-    return [lbpParticipant[0], lbpParticipant[1].compensationWei.toString()]
   })
 
-  const tree = StandardMerkleTree.of(merkleTreeValues, ["address", "uint256"])
-  fs.writeFileSync('tree.json', JSON.stringify(tree.dump()))
+  fs.writeFileSync(`refunds/completed-refund-${START_INDEX}-${i}.json`, JSON.stringify(compensationArray, null, 4))
+
 }
 
 void main()
 
-function extractAddress(input: string): string {
-  const regex = />(.*?)</; // Matches anything between ">" and "<"
-  const match = input.match(regex);
-  if (match && match[1]) {
-      const addr = match[1]
-      try {
-        return getAddress(addr)
-      } catch (error) {
-        const index = addr.indexOf("0x")
-        const fixedAddress = addr.slice(0, index + 2) + "00" + addr.slice(index + 2)
-
-        return getAddress(fixedAddress)
-      }
-
-      // return addr
-  } else {
-    throw Error('Failed to extract for ' + input)
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
   }
+  return chunks;
+}
+
+function createArrayOfValues(value: string, n: number): string[] {
+  const array: string[] = [];
+
+  for (let i = 0; i < n; i++) {
+      array.push(value);
+  }
+
+  return array;
+}
+
+function createArrayOfBigInt(value: bigint, n: number): bigint[] {
+  const array: bigint[] = [];
+
+  for (let i = 0; i < n; i++) {
+      array.push(value);
+  }
+
+  return array;
 }

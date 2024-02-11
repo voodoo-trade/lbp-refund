@@ -1,6 +1,6 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "MultiSend",
+  "contractName": "Vyper_contract",
   "abi": [
     {
       "name": "__init__",
