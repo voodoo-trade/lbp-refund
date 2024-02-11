@@ -2,5 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { LiquidityBootstrapPool } from "./LiquidityBootstrapPool";
+export type { MultiSend } from "./MultiSend";
 export * as factories from "./factories";
 export { LiquidityBootstrapPool__factory } from "./factories/LiquidityBootstrapPool__factory";
+export { MultiSend__factory } from "./factories/MultiSend__factory";
