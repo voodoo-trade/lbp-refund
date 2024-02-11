@@ -45,7 +45,7 @@ async function main() {
       vmxBought: lbpParticipant[1].vmxBought,
       compensationWei: lbpParticipant[1].compensationWei.toString(),
     }
-  })
+  }).sort((a, b) => a.vmxBought - b.vmxBought)
 
   fs.writeFileSync('compensation.json', JSON.stringify(compensationArray, null, 4))
 
